@@ -1,54 +1,51 @@
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-class BankAccountTest {
+public class BankAccountTest {
+    private BankAccount account;
 
-    @org.junit.jupiter.api.Test
-    void deposit() {
-        BankAccount account=new BankAccount("123","Li",500);
-        account.deposit(100);
-        assertEquals(account.balance,600);
-        account.deposit(-100);
+    @BeforeEach
+    public void setUp() {
+        account = new BankAccount("000001", "John Doe", 1000.0);
     }
 
-    @org.junit.jupiter.api.Test
-    void withdraw() {
-        BankAccount account=new BankAccount("123","Li",500);
-        account.withdraw(400);
-        assertEquals(account.balance,100);
-        account.withdraw(700);
+    @Test
+    public void testGetAccountNumber() {
+        String accountNumber = account.getAccountNumber();
+        Assertions.assertEquals("000001", accountNumber);
     }
 
-    @org.junit.jupiter.api.Test
-    void getBalance() {
-        BankAccount account=new BankAccount("123","Li",500);
-        assertEquals(account.getBalance(),500);
+    @Test
+    public void testGetAccountName() {
+        String accountName = account.getAccountName();
+        Assertions.assertEquals("John Doe", accountName);
     }
 
-    @org.junit.jupiter.api.Test
-    void getAccountNumber() {
-        BankAccount account=new BankAccount("123","Li",500);
-        assertEquals(account.getAccountNumber(),"123");
+    @Test
+    public void testGetBalance() {
+        double balance = account.getBalance();
+        Assertions.assertEquals(1000.0, balance);
     }
 
-    @org.junit.jupiter.api.Test
-    void getAccountName() {
-        BankAccount account=new BankAccount("123","Li",500);
-        assertEquals(account.getAccountName(),"Li");
+    @Test
+    public void testDeposit() {
+        account.deposit(500.0);
+        double balance = account.getBalance();
+        Assertions.assertEquals(1500.0, balance);
     }
 
-    @org.junit.jupiter.api.Test
-    void suspend() {
-        BankAccount account=new BankAccount("123","Li",500);
-        account.suspend();
-        assertTrue(account.suspended);
+    @Test
+    public void testWithdrawSufficientBalance() {
+        account.withdraw(500.0);
+        double balance = account.getBalance();
+        Assertions.assertEquals(500.0, balance);
     }
 
-    @org.junit.jupiter.api.Test
-    void resume() {
-        BankAccount account=new BankAccount("123","Li",500);
-        account.suspend();
-        assertTrue(account.suspended);
-        account.resume();
-        assertFalse(account.suspended);
+    @Test
+    public void testWithdrawInsufficientBalance() {
+        account.withdraw(1500.0);
+        double balance = account.getBalance();
+        Assertions.assertEquals(1000.0, balance); // Balance should remain the same
     }
 }

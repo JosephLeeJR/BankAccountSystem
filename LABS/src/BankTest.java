@@ -1,40 +1,82 @@
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+public class BankTest {
+    private Bank bank;
 
-class BankTest {
-
-    @Test
-    void openAccount() {
-        Bank bank = new Bank();
-        BankAccount account1 = new BankAccount("123456", "John Smith", 1000.0);
-        CurrentAccount account2 = new CurrentAccount("654321", "Jane Doe", 1000.0);
-        JuniorAccount account3= new JuniorAccount("114514","Minghao",1000,11);
-        bank.openAccount(account1);
-        bank.openAccount(account2);
-        bank.openAccount(account3);
-        System.out.println(bank.accounts);
+    @BeforeEach
+    public void setUp() {
+        bank = new Bank();
     }
 
     @Test
-    void closeAccount() {
-        Bank bank = new Bank();
-        BankAccount account1 = new BankAccount("123456", "John Smith", 1000.0);
-        CurrentAccount account2 = new CurrentAccount("654321", "Jane Doe", 1000.0);
-        bank.openAccount(account1);
-        bank.openAccount(account2);
-        System.out.println(bank.accounts);
-        bank.closeAccount(account2);
-        System.out.println(bank.accounts);
+    public void testOpenAccount() {
+        // Test opening a valid Junior account
+        bank.openAccount("John Doe", "123 Main Street", "2007-05-15", "Junior");
+        int numAccounts = bank.getNumberOfAccounts();
+        Assertions.assertEquals(1, numAccounts);
+
+        // Test opening a valid Current account
+        bank.openAccount("Jane Smith", "456 Elm Street", "1990-10-20", "Current");
+        numAccounts = bank.getNumberOfAccounts();
+        Assertions.assertEquals(2, numAccounts);
+
+        // Test opening a Junior account for a customer over 16 years old
+        bank.openAccount("Bob Brown", "789 Oak Street", "2000-01-01", "Junior");
+        numAccounts = bank.getNumberOfAccounts();
+        Assertions.assertEquals(2, numAccounts); // Account should not be opened
     }
 
     @Test
-    void infoAboutAccounts() {
-        Bank bank = new Bank();
-        BankAccount account1 = new BankAccount("123456", "John Smith", 1000.0);
-        CurrentAccount account2 = new CurrentAccount("654321", "Jane Doe", 1000.0);
-        bank.openAccount(account1);
-        bank.openAccount(account2);
-        bank.infoAboutAccounts();
+    public void testDeposit() {
+        // Open a Current account
+        bank.openAccount("John Doe", "123 Main Street", "2000-01-01", "Current");
+
+        // Test depositing into the account
+        bank.deposit("000001", 500.0);
+        double balance = bank.getBalance("000001");
+        Assertions.assertEquals(500.0, balance);
+
+        // Test depositing a negative amount
+        bank.deposit("000001", -100.0);
+        balance = bank.getBalance("000001");
+        Assertions.assertEquals(500.0, balance); // Balance should remain the same
+    }
+
+    @Test
+    public void testWithdraw() {
+        // Open a Current account
+        bank.openAccount("John Doe", "123 Main Street", "2000-01-01", "Current");
+
+        // Deposit initial amount
+        bank.deposit("000001", 1000.0);
+
+        // Test withdrawing from the account
+        bank.withdraw("000001", 500.0);
+        double balance = bank.getBalance("000001");
+        Assertions.assertEquals(500.0, balance);
+
+        // Test withdrawing more than the available balance
+        bank.withdraw("000001", 1100.0);
+        balance = bank.getBalance("000001");
+        Assertions.assertEquals(500.0, balance); // Balance should remain the same
+    }
+
+    @Test
+    public void testCloseAccount() {
+        // Open two accounts
+        bank.openAccount("John Doe", "123 Main Street", "2000-01-01", "Current");
+        bank.openAccount("Jane Smith", "456 Elm Street", "1990-10-20", "Current");
+
+        // Test closing an existing account
+        bank.closeAccount("000001");
+        int numAccounts = bank.getNumberOfAccounts();
+        Assertions.assertEquals(1, numAccounts);
+
+        // Test closing a non-existent account
+        bank.closeAccount("000003");
+        numAccounts = bank.getNumberOfAccounts();
+        Assertions.assertEquals(1, numAccounts);
     }
 }
